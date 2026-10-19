@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0a0916">
+<title>夜间信箱 · 给夜风的纸鹤</title>
+<meta name="description" content="一个人的时间。把话折成纸鹤，交给夜风。">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta property="og:type" content="website">
+<meta property="og:title" content="夜间信箱 · 给夜风的纸鹤">
+<meta property="og:description" content="一个人的时间。把话折成纸鹤，交给夜风。">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="apple-touch-icon" href="./icon.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0916'/%3E%3Cpath d='M21 7a10 10 0 1 0 4 17A11.5 11.5 0 0 1 21 7z' fill='%23e8ab62'/%3E%3C/svg%3E">
+<style>
+@font-face{font-family:"Zpix";src:url("./zpix.woff2") format("woff2");font-display:swap;font-weight:400}
+:root{--bg:#0a0916;--ink:#dcd6ec;--mute:#8b84a6;--gold:#e8ab62;--line:#2e2648}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:"Zpix","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;font-size:12px;
+  display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;
+  background:radial-gradient(120% 80% at 50% 0%,#151029 0%,#0a0916 46%,#07060d 100%);
+  padding:calc(10px + env(safe-area-inset-top,0px)) calc(12px + env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) calc(12px + env(safe-area-inset-left,0px))}
+.wrap{margin:auto;display:flex;flex-direction:column;align-items:center;width:100%;max-width:1040px;gap:12px}
+header{text-align:center}
+h1{margin:0;font-size:24px;letter-spacing:.42em;font-weight:400;color:var(--gold);padding-left:.42em}
+header p{margin:6px 0 0;font-size:12px;color:var(--mute);letter-spacing:.14em}
+
+#stage{position:relative;width:100%;max-width:900px;line-height:0;background:#000;
+  box-shadow:0 0 0 4px #2b2238,0 0 0 6px #0d0a16,0 24px 60px rgba(0,0,0,.65),0 0 90px rgba(232,171,98,.07)}
+#cv{display:block;width:100%;height:auto;aspect-ratio:320/180;image-rendering:pixelated;touch-action:none;-ms-interpolation-mode:nearest-neighbor}
+#cv.aim{cursor:crosshair}
+#cap{position:absolute;left:0;right:0;bottom:8%;text-align:center;line-height:1.6;color:#f3ead2;font-size:12px;
+  letter-spacing:.14em;pointer-events:none;opacity:0;transition:opacity .9s steps(6);
+  text-shadow:1px 1px 0 #000,-1px 1px 0 #000,1px -1px 0 #000,-1px -1px 0 #000}
+#cap.show{opacity:1}
+#lbl{position:absolute;transform:translate(-50%,-118%);background:rgba(22,17,40,.9);border:2px solid #3d3158;
+  border-radius:12px;padding:6px 12px;font-size:12px;letter-spacing:.1em;color:#c9bfe6;pointer-events:none;
+  opacity:0;transition:opacity .18s;text-align:center;line-height:1.6;white-space:nowrap;z-index:5;
+  box-shadow:0 4px 14px rgba(0,0,0,.4)}
+#lbl b{display:block;font-size:12px;font-weight:400;color:#ffe9b8;letter-spacing:.24em;padding-left:.24em}
+#lbl.show{opacity:1}
+
+#hud{display:flex;flex-direction:column;align-items:center;width:100%;max-width:680px}
+#hud>*+*{margin-top:12px}
+.row{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;min-height:42px}
+.row>*{margin:4px}
+.hint{font-size:12px;color:var(--mute);letter-spacing:.08em;text-align:center;min-height:1.6em;line-height:1.8;max-width:560px}
+.foot{display:flex;align-items:center;font-size:12px;color:#6a6388;letter-spacing:.12em}
+.foot>*+*{margin-left:18px}
+
+.px{font:inherit;font-size:12px;letter-spacing:.14em;padding:10px 18px;border:0;cursor:pointer;color:#ece6ff;
+  background:#2b2250;border-radius:12px;
+  box-shadow:0 3px 0 #191233,inset 0 1px 0 rgba(255,255,255,.12);
+  transition:background .15s,transform .06s,box-shadow .06s}
+.px:hover:not([disabled]){background:#3b2f66}
+.px:active:not([disabled]){transform:translateY(2px);box-shadow:0 1px 0 #191233,inset 0 1px 0 rgba(255,255,255,.12)}
+.px.main{background:linear-gradient(180deg,#f6bd76,#e2a45c);color:#4a2a10;font-weight:400;
+  box-shadow:0 3px 0 #97591d,inset 0 1px 0 rgba(255,255,255,.45)}
+.px.main:hover:not([disabled]){background:linear-gradient(180deg,#ffcd8b,#eeb068)}
+.px.sm{font-size:12px;padding:8px 13px;border-radius:10px}
+.px[disabled]{opacity:.4;cursor:not-allowed}
+
+/* 纸条 */
+#pw{position:fixed;top:0;right:0;bottom:0;left:0;display:none;align-items:center;justify-content:center;
+  background:rgba(4,3,10,.82);z-index:20;padding:16px}
+#pw.show{display:flex}
+.frwrap{position:relative;width:480px;max-width:100%}
+.tape{position:absolute;top:-10px;left:50%;width:96px;height:20px;transform:translateX(-50%) rotate(-2.4deg);
+  background:rgba(242,163,179,.8);z-index:2;border-radius:2px;
+  border-left:3px solid rgba(255,255,255,.5);border-right:3px solid rgba(255,255,255,.5);
+  box-shadow:0 2px 6px rgba(0,0,0,.28)}
+.fr{background:#332a4c;padding:4px;
+  clip-path:polygon(0 8px,8px 8px,8px 0,calc(100% - 8px) 0,calc(100% - 8px) 8px,100% 8px,100% calc(100% - 8px),calc(100% - 8px) calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,8px calc(100% - 8px),0 calc(100% - 8px))}
+#paper{position:relative;background:#f0e7d0;color:#3a2f26;padding:18px 22px 16px;
+  clip-path:polygon(0 6px,6px 6px,6px 0,calc(100% - 6px) 0,calc(100% - 6px) 6px,100% 6px,100% calc(100% - 6px),calc(100% - 6px) calc(100% - 6px),calc(100% - 6px) 100%,6px 100%,6px calc(100% - 6px),0 calc(100% - 6px))}
+.st{position:absolute;border-radius:50%}
+.st1{right:16px;bottom:14px;width:9px;height:9px;background:#f2a3b3;box-shadow:0 0 0 3px rgba(242,163,179,.22)}
+.st2{right:31px;bottom:19px;width:6px;height:6px;background:#e8ab62;box-shadow:0 0 0 2px rgba(232,171,98,.22)}
+.ph{display:flex;align-items:baseline;font-size:12px;color:#8a7a62;letter-spacing:.08em;margin-bottom:8px}
+.ph>*+*{margin-left:12px}
+.ph span{white-space:nowrap}
+.ph input{flex:1;min-width:0;background:transparent;border:0;border-bottom:2px dashed #c3b294;
+  font:inherit;font-size:12px;color:#3a2f26;padding:3px 2px;outline:none}
+.ph input::placeholder{color:#b0a080}
+#pText{display:block;width:100%;height:232px;resize:none;border:0;outline:none;padding:0;
+  background:repeating-linear-gradient(transparent 0 27px,#d5c8a8 27px 28px);background-attachment:local;
+  font:12px/28px "Zpix","PingFang SC",monospace;
+  color:#2f2620;caret-color:#d06a4a}
+#pText::placeholder{color:#b0a080;font-size:12px}
+.pb{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+.pb>*+*{margin-left:10px}
+.pb small{color:#a08f74;font-size:12px;letter-spacing:.08em}
+.pb .btns{display:flex}
+.pb .btns>*+*{margin-left:8px}
+.pb .px{background:#dfd3b4;color:#4a3a2a;box-shadow:0 3px 0 #b3a383,inset 0 1px 0 rgba(255,255,255,.5)}
+.pb .px:hover:not([disabled]){background:#d3c5a2}
+.pb .px:active:not([disabled]){box-shadow:0 1px 0 #b3a383,inset 0 1px 0 rgba(255,255,255,.5)}
+.pb .px.main{background:linear-gradient(180deg,#e06a4a,#c0452a);color:#fff3e0;
+  box-shadow:0 3px 0 #8a2f1c,inset 0 1px 0 rgba(255,255,255,.35)}
+.pb .px.main:hover:not([disabled]){background:linear-gradient(180deg,#ec7a5a,#cf5236)}
+.pb .px.main:active:not([disabled]){box-shadow:0 1px 0 #8a2f1c,inset 0 1px 0 rgba(255,255,255,.35)}
+.shake{animation:shake .3s steps(5)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* 纸鹤簿 */
+#bw{position:fixed;top:0;right:0;bottom:0;left:0;display:none;align-items:center;justify-content:center;
+  background:rgba(4,3,10,.82);z-index:21;padding:16px}
+#bw.show{display:flex}
+#book{width:480px;max-width:100%;max-height:76vh;display:flex;flex-direction:column;
+  background:#f0e7d0;color:#3a2f26;padding:16px 18px 12px;
+  clip-path:polygon(0 6px,6px 6px,6px 0,calc(100% - 6px) 0,calc(100% - 6px) 6px,100% 6px,100% calc(100% - 6px),calc(100% - 6px) calc(100% - 6px),calc(100% - 6px) 100%,6px 100%,6px calc(100% - 6px),0 calc(100% - 6px))}
+.bkhead b{font-size:12px;color:#6a4a2a;letter-spacing:.3em;display:block;padding-left:.3em}
+.bkhead span{font-size:12px;color:#a08f74;letter-spacing:.06em;display:block;margin-top:5px}
+#bkList{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;margin:10px 0 8px;border-top:2px dashed #d8c9a4;border-bottom:2px dashed #d8c9a4;min-height:80px}
+.bk{padding:10px 2px;border-bottom:1px dashed #ddcfae;cursor:pointer}
+.bk:last-child{border-bottom:0}
+.bk:hover{background:#e8dec4}
+.bk .bm{font-size:12px;color:#8a7a62;letter-spacing:.06em}
+.bk .bt{font-size:12px;line-height:24px;color:#3a2f26;margin:6px 0 0;white-space:pre-wrap;word-break:break-word;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.bk.open .bt{-webkit-line-clamp:unset;display:block}
+.bkempty{font-size:12px;color:#a08f74;text-align:center;padding:30px 0;letter-spacing:.1em}
+.bkb{display:flex;justify-content:flex-end}
+.bkb>*+*{margin-left:8px}
+.bkb .px{background:#dfd3b4;color:#4a3a2a;box-shadow:0 3px 0 #b3a383,inset 0 1px 0 rgba(255,255,255,.5)}
+.bkb .px:hover:not([disabled]){background:#d3c5a2}
+.bkb .px:active:not([disabled]){box-shadow:0 1px 0 #b3a383,inset 0 1px 0 rgba(255,255,255,.5)}
+.bkb .px.main{background:linear-gradient(180deg,#e06a4a,#c0452a);color:#fff3e0;
+  box-shadow:0 3px 0 #8a2f1c,inset 0 1px 0 rgba(255,255,255,.35)}
+.bkb .px.main:hover:not([disabled]){background:linear-gradient(180deg,#ec7a5a,#cf5236)}
+@media (max-width:520px){
+  body{padding:calc(8px + env(safe-area-inset-top,0px)) calc(8px + env(safe-area-inset-right,0px)) calc(14px + env(safe-area-inset-bottom,0px)) calc(8px + env(safe-area-inset-left,0px))}
+  .wrap{gap:10px}
+  h1{font-size:22px}
+  header p{margin-top:5px}
+  #hud>*+*{margin-top:10px}
+  #pText{height:200px}
+  .px{letter-spacing:.1em}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>夜间信箱</h1>
+  <p>一个人的时间。把话折成纸鹤，交给夜风。</p>
+</header>
+
+<div id="stage"><canvas id="cv"></canvas><div id="cap"></div><div id="lbl"></div></div>
+
+<div id="hud">
+  <div class="row">
+    <button class="px" id="bMap" style="display:none">回到地图</button>
+    <button class="px main" id="bWrite">写一张小纸条</button>
+  </div>
+  <div class="row" id="row2" style="display:none">
+    <button class="px" data-p="near">近处</button>
+    <button class="px" data-p="mid">中距离</button>
+    <button class="px" data-p="far">远方</button>
+    <button class="px sm" id="bBack">再改改</button>
+  </div>
+  <div class="hint" id="hint"></div>
+  <div class="foot"><button class="px sm" id="bSnd">声音：开</button><button class="px sm" id="bBook">纸鹤簿</button><span id="cnt"></span></div>
+</div>
+
+</div>
+
+<div id="pw">
+  <div class="frwrap"><i class="tape"></i>
+  <div class="fr"><div id="paper">
+    <i class="st st1"></i><i class="st st2"></i>
+    <div class="ph"><span id="pDate"></span><input id="pFilm" maxlength="30" placeholder="今天看了…（片名，可不填）" autocomplete="off"></div>
+    <textarea id="pText" maxlength="600" placeholder="写给今晚的自己，或者写给风。&#10;没有人会回复，也不用回复。"></textarea>
+    <div class="pb"><small id="pLen">0 / 600</small>
+      <div class="btns"><button class="px sm" id="pCancel">先不写了</button><button class="px sm main" id="pGo">折成纸鹤</button></div>
+    </div>
+  </div></div></div>
+</div>
+
+<div id="bw"><div id="book">
+  <div class="bkhead"><b>纸鹤簿</b><span>放出去的，都在这儿。只留在这台设备里 · 点一下卡片展开</span></div>
+  <div id="bkList"></div>
+  <div class="bkb"><button class="px sm" id="bkClear">清空</button><button class="px sm main" id="bkClose">收好</button></div>
+</div></div>
+
+<script src="./app.js"></script>
+</body>
+</html>
